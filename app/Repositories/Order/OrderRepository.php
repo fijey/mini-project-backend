@@ -3,16 +3,19 @@
 namespace App\Repositories\Order;
 
 use App\Repositories\Order\OrderhRepositoryInterface;
+use App\Models\Cart;
+use App\Models\Order;
+use App\Models\OrderDetail;
+use Illuminate\Support\Str; 
 
-class AuthRepository implements AuthRepositoryInterface
+class OrderRepository implements OrderRepositoryInterface
 {
-    public function store($data)
+    public function store($request)
     {
         try {
+                
             $user = auth()->user();
-            
             $cartItems = Cart::where('user_id', $user->id)->with('product')->get();
-
 
             // Calculate the total price
             $totalPrice = $cartItems->sum(function ($cartItem) {
@@ -20,6 +23,7 @@ class AuthRepository implements AuthRepositoryInterface
             });
 
             $invoiceNumber = Str::random(10);
+
             // Create a new order record
             $order = Order::create([
                 'invoice' => $invoiceNumber,
@@ -41,17 +45,16 @@ class AuthRepository implements AuthRepositoryInterface
             // Clear the user's cart
             $cartItems->each->delete();
 
-            // Return a success response
-            return response()->json([
-                'message' => 'Checkout successful!',
-                'totalPrice' => $totalPrice,
-            ]);
+         
         } catch (\Exception $e) {
-            // Handle any exceptions that occur during the checkout process
-            return response()->json([
-                'error' => 'An error occurred during checkout.',
-                'message' => $e->getMessage()
-            ], 500);
+            // Log the exception
+            Log::error('Error during checkout: ' . $e->getMessage(), [
+                'method' => __METHOD__,
+                'user_id' => $user->id,
+            ]);
+
+            // Rethrow the exception as a RuntimeException
+            throw new \RuntimeException('An error occurred during checkout.', 500, $e);
         }
     }
 }
