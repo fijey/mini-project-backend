@@ -4,6 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\OrderController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -27,5 +29,18 @@ Route::prefix('product')->group(function () {
         Route::post('/', [ProductController::class, 'store']);
         Route::post('/{id}', [ProductController::class, 'update']);
         Route::delete('/{id}', [ProductController::class, 'destroy']);
+    });
+});
+
+Route::prefix('cart')->group(function () {
+    Route::middleware(['auth:sanctum'])->group(function () {
+        Route::get('/', [CartController::class, 'getCart']);
+        Route::post('/', [CartController::class, 'store']);
+    });
+});
+Route::prefix('order')->group(function () {
+    Route::middleware(['auth:sanctum'])->group(function () {
+        Route::get('/', [OrderController::class, 'index']);
+        Route::post('/', [OrderController::class, 'store']);
     });
 });

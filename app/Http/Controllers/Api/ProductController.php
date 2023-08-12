@@ -12,33 +12,38 @@ class ProductController extends Controller
     protected $productRepository;
     protected $imageService;
 
-    public function __construct(ProductRepositoryInterface $productRepository,ImageService $imageService)
+    public function __construct(ProductRepositoryInterface $productRepository, ImageService $imageService)
     {
         $this->productRepository = $productRepository;
         $this->imageService = $imageService;
     }
 
-     public function index()
+    private function getValidationRules()
     {
-        $products = $this->productRepository->all();
-
-        return response()->json($products, 200);
-    }
-     public function edit($id)
-    {
-        $products = $this->productRepository->find($id);
-
-        return response()->json($products, 200);
-    }
-    public function store(Request $request)
-    {
-        $validate = $request->validate([
+        return [
             'name' => 'required|string|max:255',
             'price' => 'required|numeric',
             'quantity' => 'required|integer',
             'description' => 'nullable|string',
             'image' => 'nullable|image|max:2048',
-        ]);
+        ];
+    }
+
+    public function index()
+    {
+        $products = $this->productRepository->all();
+        return response()->json($products, 200);
+    }
+
+    public function edit($id)
+    {
+        $product = $this->productRepository->find($id);
+        return response()->json($product, 200);
+    }
+
+    public function store(Request $request)
+    {
+        $validate = $request->validate($this->getValidationRules());
 
         $validate['image'] = $this->imageService->uploadImage($request);
 
@@ -46,6 +51,7 @@ class ProductController extends Controller
 
         return response()->json(['message' => 'Product created successfully'], 201);
     }
+
     public function update(Request $request, $id)
     {
         $product = $this->productRepository->find($id);
@@ -54,25 +60,18 @@ class ProductController extends Controller
             return response()->json(['message' => 'Product not found'], 404);
         }
 
-        $validate = $request->validate([
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric',
-            'quantity' => 'required|integer',
-            'description' => 'nullable|string',
-            'image' => 'nullable|image|max:2048',
-        ]);
+        $validate = $request->validate($this->getValidationRules($id));
 
         $validate['image'] = $this->imageService->uploadImage($request);
 
-        $update = $this->productRepository->update($validate,$id);
+        $update = $this->productRepository->update($validate, $id);
 
         return response()->json(['message' => 'Product updated successfully'], 200);
     }
 
-    public function destroy($id){
+    public function destroy($id)
+    {
         $product = $this->productRepository->delete($id);
-
         return response()->json(['message' => 'Product Delete successfully'], 200);
     }
-
 }
