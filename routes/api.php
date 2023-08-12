@@ -22,7 +22,9 @@ Route::post('/register', [AuthController::class, 'register']);
 
 Route::prefix('product')->group(function () {
     Route::middleware(['auth:sanctum'])->group(function () {
+        Route::get('/', [ProductController::class, 'index']);
+        Route::get('/{id}', [ProductController::class, 'edit']);
         Route::post('/', [ProductController::class, 'store']);
-        Route::put('/{id}', [ProductController::class, 'update']);
+        Route::post('/{id}', [ProductController::class, 'update']);
     });
 });
