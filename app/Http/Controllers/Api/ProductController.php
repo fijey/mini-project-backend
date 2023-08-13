@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Repositories\Products\ProductRepositoryInterface;
 use App\Services\ImageService;
 use App\Jobs\ProductsExportJob;
+use Auth;
 
 class ProductController extends Controller
 {
@@ -78,7 +79,7 @@ class ProductController extends Controller
 
     public function export(){
 
-        ProductsExportJob::dispatch();
+        ProductsExportJob::dispatch(Auth::user()->id);
 
         return response()->json(['message' => 'Ekspor telah dimulai.'],200);
     }

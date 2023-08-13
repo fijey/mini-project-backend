@@ -8,8 +8,10 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use App\Models\ExportManager;
 use Excel;
 use Storage;
+use Auth;
 use App\Exports\ProductsExport;
 
 class ProductsExportJob implements ShouldQueue
@@ -21,9 +23,11 @@ class ProductsExportJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct()
+
+     protected $user_id;
+    public function __construct($id)
     {
-        //
+        $this->user_id = $id;
     }
 
     /**
@@ -36,7 +40,7 @@ class ProductsExportJob implements ShouldQueue
         try {
             $export = new ProductsExport();
             $fileName = 'products_' . now()->format('YmdHis') . '.xlsx'; // Nama file unik dengan timestamp
-
+            $id = $this->insertExportManager($fileName);
             $temporaryPath = storage_path('app/excel/' . $fileName); // Path sementara
 
             Excel::store($export, 'excel/' . $fileName); // Menyimpan ekspor ke penyimpanan sementara
@@ -45,10 +49,34 @@ class ProductsExportJob implements ShouldQueue
 
             unlink($temporaryPath); // Menghapus file sementara
 
+            $this->updateExportManager($id,$fileName);
 
-        } catch (\Exception $e) {
 
+        } catch (\throw $e) {
+
+            
         }
+    }
+
+    public function insertExportManager($name){
+        $export=ExportManager::create([
+            'name' => $name,
+            'from_page' => 'products',
+            'export_start' => now()->format('Y-m-d H:i:s'),
+            'status' => "running",
+            'url_file' => "",
+            'user_id' => $this->user_id
+        ]);
+
+        return $export->id;
+    }
+    public function updateExportManager($id,$url_file){
+        $exportManager = ExportManager::find($id);
+        $exportManager->update([
+            'export_end' => now()->format('Y-m-d H:i:s'),
+            'status' => "finished",
+            'url_file' => asset('report/'.$url_file)
+        ]);
     }
 
 }
