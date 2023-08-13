@@ -34,7 +34,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         } catch (\Exception $e) {
 
-            return response()->json(['message' => 'An error occurred'], 500);
+            return response()->json(['message' => 'An error occurred '.$e->getMessage().''], 500);
         }
     }
 
