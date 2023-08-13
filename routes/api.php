@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\ExportManagerController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -43,5 +44,11 @@ Route::prefix('order')->group(function () {
     Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/', [OrderController::class, 'getOrderList']);
         Route::post('/', [OrderController::class, 'store']);
+    });
+});
+Route::prefix('export-manager')->group(function () {
+    Route::middleware(['auth:sanctum'])->group(function () {
+        Route::get('/', [ExportManagerController::class, 'index']);
+        Route::post('/', [ExportManagerController::class, 'destroy']);
     });
 });

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Repositories\Products\ProductRepositoryInterface;
+use App\Repositories\ExportManager\ExportManagerRepositoryInterface;
 use App\Services\ImageService;
 use App\Jobs\ProductsExportJob;
 use Auth;
@@ -77,9 +78,9 @@ class ProductController extends Controller
         return response()->json(['message' => 'Product Delete successfully'], 200);
     }
 
-    public function export(){
+    public function export(ExportManagerRepositoryInterface $exportManagerRepository){
 
-        ProductsExportJob::dispatch(Auth::user()->id);
+        ProductsExportJob::dispatch(Auth::user()->id,$exportManagerRepository);
 
         return response()->json(['message' => 'Ekspor telah dimulai.'],200);
     }

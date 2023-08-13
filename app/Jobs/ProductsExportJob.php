@@ -25,9 +25,11 @@ class ProductsExportJob implements ShouldQueue
      */
 
      protected $user_id;
-    public function __construct($id)
+     protected $exportManagerRepository;
+    public function __construct($id, $exportManagerRepository)
     {
         $this->user_id = $id;
+        $this->exportManagerRepository = $exportManagerRepository;
     }
 
     /**
@@ -59,16 +61,18 @@ class ProductsExportJob implements ShouldQueue
     }
 
     public function insertExportManager($name){
-        $export=ExportManager::create([
+        $export=[
             'name' => $name,
             'from_page' => 'products',
             'export_start' => now()->format('Y-m-d H:i:s'),
             'status' => "running",
             'url_file' => "",
             'user_id' => $this->user_id
-        ]);
+        ];
 
-        return $export->id;
+        $result = $this->exportManagerRepository->create($export);
+
+        return $result->id;
     }
     public function updateExportManager($id,$url_file){
         $exportManager = ExportManager::find($id);
