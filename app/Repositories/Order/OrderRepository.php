@@ -7,9 +7,28 @@ use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use Illuminate\Support\Str; 
+use Illuminate\Support\Facades\Log;
 
 class OrderRepository implements OrderRepositoryInterface
 {
+
+    public function getOrderList(){
+        try {
+            $user = auth()->user();
+
+           return Order::with('orderDetails','orderDetails.product')->where('user_id', $user->id)->get();
+         
+        } catch (\Exception $e) {
+            // Log the exception
+            Log::error('Error during get data order: ' . $e->getMessage(), [
+                'method' => __METHOD__,
+                'user_id' => $user->id,
+            ]);
+
+            // Rethrow the exception as a RuntimeException
+            throw new \RuntimeException('An error occurred during get data order.', 500, $e);
+        }
+    }
     public function store($request)
     {
         try {
@@ -29,7 +48,6 @@ class OrderRepository implements OrderRepositoryInterface
                 'invoice' => $invoiceNumber,
                 'user_id' => $user->id,
                 'sub_total' => $totalPrice,
-                // You might want to add more fields based on your order schema
             ]);
 
             foreach ($cartItems as $cartItem) {
@@ -37,8 +55,8 @@ class OrderRepository implements OrderRepositoryInterface
                     'order_id' => $order->id,
                     'product_id' => $cartItem->product->id,
                     'sub_total' => $cartItem->product->price * $cartItem->quantity,
+                    'quantity' => $cartItem->quantity,
                     'user_id' => $user->id,
-                    // You might want to add more fields based on your order details schema
                 ]);
             }
 

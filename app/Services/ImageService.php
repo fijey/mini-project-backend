@@ -13,7 +13,7 @@ class ImageService
             $image->move(public_path('images'), $imageName);
 
 
-            return $imageName;
+            return asset('images/'.$imageName);
         }
     }
 }

@@ -12,6 +12,23 @@ class OrderController extends Controller
     public function __construct(OrderRepositoryInterface $orderRepository){
         $this->orderRepository = $orderRepository;
     }
+
+    public function getOrderList(){
+        try {
+            $order = $this->orderRepository->getOrderList();
+
+            return response()->json([
+                'message' => 'Get Order successful!',
+                'data' => $order,
+            ]);
+        } catch (\Exception $e) {
+            // Handle any exceptions that occur during the checkout process
+            return response()->json([
+                'error' => 'An error occurred during get Order.',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
     public function store(Request $request)
     {
         try {

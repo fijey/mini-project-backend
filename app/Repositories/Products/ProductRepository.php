@@ -10,7 +10,7 @@ class ProductRepository implements ProductRepositoryInterface
 {
     public function all()
     {
-        return Product::all();
+        return Product::orderBy('created_at','DESC')->paginate(50);
     }
 
     public function find($id)

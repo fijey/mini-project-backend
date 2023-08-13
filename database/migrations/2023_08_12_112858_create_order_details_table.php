@@ -18,6 +18,7 @@ return new class extends Migration
             $table->bigInteger('order_id');
             $table->bigInteger('product_id');
             $table->bigInteger('sub_total');
+            $table->bigInteger('quantity');
             $table->bigInteger('user_id');
             $table->timestamps();
         });

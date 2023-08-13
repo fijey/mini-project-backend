@@ -40,7 +40,7 @@ Route::prefix('cart')->group(function () {
 });
 Route::prefix('order')->group(function () {
     Route::middleware(['auth:sanctum'])->group(function () {
-        Route::get('/', [OrderController::class, 'index']);
+        Route::get('/', [OrderController::class, 'getOrderList']);
         Route::post('/', [OrderController::class, 'store']);
     });
 });

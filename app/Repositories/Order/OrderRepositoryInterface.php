@@ -4,7 +4,11 @@ namespace App\Repositories\Order;
 
 interface OrderRepositoryInterface
 {
-    // Insert Order Data
+
+    //getting order list
+    public function getOrderList();
+
+    // insert data order
     public function store($data);
 
 }
