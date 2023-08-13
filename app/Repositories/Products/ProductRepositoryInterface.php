@@ -4,7 +4,7 @@ namespace App\Repositories\Products;
 
 interface ProductRepositoryInterface
 {
-    public function all();
+    public function all($request);
 
     public function find($id);
 

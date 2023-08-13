@@ -25,6 +25,7 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::prefix('product')->group(function () {
     Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/', [ProductController::class, 'index']);
+        Route::get('/export-excel', [ProductController::class, 'export']);
         Route::get('/{id}', [ProductController::class, 'edit']);
         Route::post('/', [ProductController::class, 'store']);
         Route::post('/{id}', [ProductController::class, 'update']);

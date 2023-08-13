@@ -8,9 +8,35 @@ use App\Repositories\Products\ProductRepositoryInterface;
 
 class ProductRepository implements ProductRepositoryInterface
 {
-    public function all()
+    public function all($request)
     {
-        return Product::orderBy('created_at','DESC')->paginate(50);
+        $query = Product::query();
+
+        $filters = $request->filters;
+        if ($filters) {
+            $filters = json_decode($filters, true);
+
+            if (isset($filters['name']) && $filters['name'] != "") {
+                $query->where('name', 'like', '%' . $filters['name'] . '%');
+            }
+
+            if (isset($filters['min_price']) && $filters['min_price'] != "") {
+                $query->where('price', '>=', $filters['min_price']);
+            }
+
+            if (isset($filters['max_price'])&& $filters['max_price'] != "") {
+                $query->where('price', '<=', $filters['max_price']);
+            }
+
+            if (isset($filters['quantity'])&& $filters['quantity']) {
+                $query->where('quantity', '=', $filters['quantity']);
+            }
+
+        }
+
+        $products = $query->paginate(50);
+
+        return $products;
     }
 
     public function find($id)

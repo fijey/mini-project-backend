@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Repositories\Products\ProductRepositoryInterface;
 use App\Services\ImageService;
+use App\Jobs\ProductsExportJob;
 
 class ProductController extends Controller
 {
@@ -29,9 +30,9 @@ class ProductController extends Controller
         ];
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $products = $this->productRepository->all();
+        $products = $this->productRepository->all($request);
         return response()->json($products, 200);
     }
 
@@ -73,5 +74,12 @@ class ProductController extends Controller
     {
         $product = $this->productRepository->delete($id);
         return response()->json(['message' => 'Product Delete successfully'], 200);
+    }
+
+    public function export(){
+
+        ProductsExportJob::dispatch();
+
+        return response()->json(['message' => 'Ekspor telah dimulai.'],200);
     }
 }
