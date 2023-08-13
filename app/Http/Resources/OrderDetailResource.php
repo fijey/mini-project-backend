@@ -3,6 +3,8 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\OrderDetailProductResource;
+use App\Models\Product;
 
 class OrderDetailResource extends JsonResource
 {
@@ -14,6 +16,16 @@ class OrderDetailResource extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        $product = @Product::where('id',$this->product_id)->first();
+        return [
+            'id' => $this->id,
+            'order_id' => $this->order_id,
+            'product_id' => $this->product_id,
+            'sub_total' => 'Rp ' . number_format($this->sub_total, 2, ',', '.'),
+            'quantity' => $this->quantity,
+            'user_id' => $this->user_id,
+            'product' => OrderDetailProductResource::make($product),
+            // Add more fields as needed
+        ];
     }
 }

@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\OrderDetail;
 use Illuminate\Support\Str; 
 use Illuminate\Support\Facades\Log;
+use App\Http\Resources\OrderResource;
 
 class OrderRepository implements OrderRepositoryInterface
 {
@@ -16,7 +17,9 @@ class OrderRepository implements OrderRepositoryInterface
         try {
             $user = auth()->user();
 
-           return Order::with('orderDetails','orderDetails.product')->where('user_id', $user->id)->get();
+           $order =  Order::with('orderDetails','orderDetails.product')->where('user_id', $user->id)->get();
+
+           return OrderResource::collection($order);
          
         } catch (\Exception $e) {
             // Log the exception
